@@ -1,0 +1,56 @@
+FROM alpine
+
+LABEL maintainer="yee.yi@vesoft.com"
+
+RUN apk add --no-cache \
+    autoconf \
+    autoconf-archive \
+    automake \
+    bison \
+    boost \
+    boost-dev \
+    boost-static \
+    bzip2-dev \
+    cmake \
+    curl \
+    file \
+    flex \
+    gcc \
+    g++ \
+    git \
+    gperf \
+    openjdk8 \
+    krb5-dev \
+    libstdc++ \
+    libunwind \
+    libunwind-dev \
+    libtool \
+    make \
+    maven \
+    ncurses \
+    ncurses-dev \
+    openssl \
+    openssl-dev \
+    perl \
+    python \
+    readline \
+    readline-dev \
+    unzip \
+    vim \
+    wget \
+    xz-dev
+
+RUN mkdir -p /home/nebula
+
+WORKDIR /home/nebula
+
+RUN git clone --single-branch --branch master https://github.com/vesoft-inc/nebula-3rdparty.git /home/nebula/nebula-3rdparty \
+  && cd /home/nebula/nebula-3rdparty \
+  && cmake -DSKIP_JAVA_JAR=ON . \
+  && make && make install \
+  && cd /home/nebula \
+  && rm -rf /home/nebula/*
+
+  # TODO(yee): Upgrade thrift refer to https://github.com/facebook/fbthrift/commit/fc37c6ab226e9a18c23ac682ceda8c427631b64e
+  # && cd third-party/fbthrift/thrift/lib/java/thrift \
+  # && mvn compile install \
