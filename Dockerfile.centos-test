@@ -28,7 +28,8 @@ RUN yum update -y \
   && rm -rf /var/cache/yum
 
 RUN scl enable devtoolset-8 -- bash \
-  && echo 'export LIBRARY_PATH="/usr/lib/x86_64-linux-gnu:$LIBRARY_PATH"\nsource /opt/rh/devtoolset-8/enable' >> ~/.bashrc
+  && mkdir -p /home/nebula \
+  && echo 'source /opt/rh/devtoolset-8/enable' >> ~/.bash_profile
 
 # Install openssl-1.1.1c
 RUN wget https://www.openssl.org/source/openssl-1.1.1c.tar.gz \
@@ -102,15 +103,13 @@ RUN wget https://github.com/libunwind/libunwind/releases/download/v1.2.1/libunwi
   && cd .. \
   && rm -rf libunwind-*
 
+# Build and Install thirdparty
 RUN mkdir -p /home/nebula \
   && git clone https://github.com/yixinglu/nebula-3rdparty.git /home/nebula/nebula-3rdparty \
   && cd /home/nebula/nebula-3rdparty \
-  && LIBRARY_PATH="/usr/lib/x86_64-linux-gnu:$LIBRARY_PATH" cmake -DCMAKE_C_COMPILER=/opt/rh/devtoolset-8/root/usr/bin/gcc -DCMAKE_CXX_COMPILER=/opt/rh/devtoolset-8/root/usr/bin/g++ -DSKIP_JAVA_JAR=ON . \
-  && LIBRARY_PATH="/usr/lib/x86_64-linux-gnu:$LIBRARY_PATH" make && make install \
+  && cmake -DSKIP_JAVA_JAR=ON . \
+  && make && make install \
   && cd /home/nebula \
   && rm -rf /home/nebula/*
-
-  # && cd third-party/fbthrift/thrift/lib/java/thrift \
-  # && mvn compile install \
 
 WORKDIR /home/nebula
