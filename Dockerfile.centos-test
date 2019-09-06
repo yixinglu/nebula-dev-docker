@@ -4,48 +4,108 @@ LABEL maintainer="yee.yi@vesoft.com"
 
 RUN yum update -y \
   && yum install -y centos-release-scl \
-  && yum install -y devtoolset-8 \
-  && scl enable devtoolset-8 -- bash \
-  && yum -y install git \
-    vim \
-    wget \
-    libtool \
+  && yum install -y \
     autoconf \
     autoconf-archive \
     automake \
+    devtoolset-8 \
+    file \
+    git \
+    java-1.8.0-openjdk \
+    libtool \
+    libstdc++-static \
     make \
+    maven \
+    ncurses-devel \
     perl \
     perl-WWW-Curl \
-    libstdc++-static \
-    ncurses-devel \
     readline-devel \
-    xz-devel \
-    maven \
     unzip \
-    file \
-    java-1.8.0-openjdk \
+    vim \
+    wget \
+    xz-devel \
   && yum clean all \
   && rm -rf /var/cache/yum
 
-RUN useradd -mr engshare && chmod -R 755 /home/engshare
+RUN scl enable devtoolset-8 -- bash \
+  && echo 'export LIBRARY_PATH="/usr/lib/x86_64-linux-gnu:$LIBRARY_PATH"\nsource /opt/rh/devtoolset-8/enable' >> ~/.bashrc
 
-RUN wget https://nebula-graph.oss-cn-hangzhou.aliyuncs.com/build-deb/centos-7.5-1804.tar.gz \
-  && tar xf centos-7.5-1804.tar.gz  \
-  && rpm -ivh centos-7.5-1804/*.rpm \
-  && wget http://ftp.gnu.org/gnu/bison/bison-3.0.5.tar.gz \
+# Install openssl-1.1.1c
+RUN wget https://www.openssl.org/source/openssl-1.1.1c.tar.gz \
+  && tar zxf openssl-1.1.1c.tar.gz \
+  && cd openssl-1.1.1c \
+  && ./config no-shared threads -fPIC -DPIC -static-libgcc -static-libstdc++ \
+  && make && make install \
+  && cd .. \
+  && rm -rf openssl-*
+
+# Install cmake-3.11.4
+RUN wget https://github.com/Kitware/CMake/releases/download/v3.11.4/cmake-3.11.4.tar.gz \
+  && tar zxf cmake-3.11.4.tar.gz \
+  && cd cmake-3.11.4 \
+  && ./configure && make && make install \
+  && cd .. \
+  && rm -rf cmake-*
+
+# Install bison-3.0.5
+RUN wget http://ftp.gnu.org/gnu/bison/bison-3.0.5.tar.gz \
   && tar xf bison-3.0.5.tar.gz \
-  && cd bison-3.0.5 && ./configure && make && make install && cd .. \
-  && rm -rf centos-7.5-1804* bison-*
+  && cd bison-3.0.5 \
+  && ./configure \
+  && make && make install \
+  && cd .. \
+  && rm -rf bison-*
 
-RUN echo 'alias ctest="/home/engshare/cmake/bin/ctest"\n\
-alias cmake="/home/engshare/cmake/bin/cmake -DCMAKE_C_COMPILER=/opt/rh/devtoolset-8/root/usr/bin/gcc -DCMAKE_CXX_COMPILER=/opt/rh/devtoolset-8/root/usr/bin/g++ -DNEBULA_GPERF_BIN_DIR=/home/engshare/gperf/bin -DNEBULA_FLEX_ROOT=/home/engshare/flex -DNEBULA_BOOST_ROOT=/home/engshare/boost -DNEBULA_OPENSSL_ROOT=/home/engshare/openssl -DNEBULA_KRB5_ROOT=/home/engshare/krb5 -DNEBULA_LIBUNWIND_ROOT=/home/engshare/libunwind"\n\
-export LIBRARY_PATH="/usr/lib/x86_64-linux-gnu:$LIBRARY_PATH"\n\
-source /opt/rh/devtoolset-8/enable' >> ~/.bashrc
+# Install flex-2.6.4
+RUN wget https://github.com/westes/flex/releases/download/v2.6.4/flex-2.6.4.tar.gz \
+  && tar zxf https://github.com/westes/flex/releases/download/v2.6.4/flex-2.6.4.tar.gz \
+  && cd flex-2.6.4 \
+  && ./configure --enable-shared=no \
+  && make && make install \
+  && cd .. \
+  && rm -rf flex-*
+
+# Install boost-1.66
+RUN wget https://dl.bintray.com/boostorg/release/1.66.0/source/boost_1_66_0.tar.gz \
+  && tar zxf boost_1_66_0.tar.gz \
+  && cd boost_1_66_0 \
+  && ./bootstrap.sh --without-icu --without-libraries=python \
+  && ./b2 link=static runtime-link=static install \
+  && ./b2 --clean-all \
+  && cd .. \
+  && rm -rf boost_*
+
+# Install gperf-3.1
+RUN wget http://ftp.gnu.org/pub/gnu/gperf/gperf-3.1.tar.gz \
+  && tar zxf gperf-3.1.tar.gz \
+  && cd gperf-3.1 \
+  && ./configure --enable-shared=no \
+  && make && make install \
+  && cd .. \
+  && rm -rf gperf-*
+
+# Install krb5-1.16.3
+RUN wget https://github.com/krb5/krb5/archive/krb5-1.16.3-final.tar.gz \
+  && tar zxf krb5-1.16.3-final.tar.gz \
+  && cd krb5-krb5-1.16.3-final/src \
+  && autoreconf \
+  && ./configure --enable-static --disable-shared --disable-rpath --disable-aesni --disable-thread-support \
+  && make all && make install \
+  && cd .. \
+  && rm -rf krb5-*
+
+# Install libunwind-1.2.1
+RUN wget https://github.com/libunwind/libunwind/releases/download/v1.2.1/libunwind-1.2.1.tar.gz \
+  && tar zxf libunwind-1.2.1.tar.gz \
+  && cd libunwind-1.2.1 \
+  && ./configure --enable-shared=no \
+  && cd .. \
+  && rm -rf libunwind-*
 
 RUN mkdir -p /home/nebula \
   && git clone https://github.com/yixinglu/nebula-3rdparty.git /home/nebula/nebula-3rdparty \
   && cd /home/nebula/nebula-3rdparty \
-  && LIBRARY_PATH="/usr/lib/x86_64-linux-gnu:$LIBRARY_PATH" /home/engshare/cmake/bin/cmake -DCMAKE_C_COMPILER=/opt/rh/devtoolset-8/root/usr/bin/gcc -DCMAKE_CXX_COMPILER=/opt/rh/devtoolset-8/root/usr/bin/g++ -DNEBULA_GPERF_BIN_DIR=/home/engshare/gperf/bin -DNEBULA_FLEX_ROOT=/home/engshare/flex -DNEBULA_BOOST_ROOT=/home/engshare/boost -DNEBULA_OPENSSL_ROOT=/home/engshare/openssl -DNEBULA_KRB5_ROOT=/home/engshare/krb5 -DNEBULA_LIBUNWIND_ROOT=/home/engshare/libunwind -DSKIP_JAVA_JAR=ON . \
+  && LIBRARY_PATH="/usr/lib/x86_64-linux-gnu:$LIBRARY_PATH" cmake -DCMAKE_C_COMPILER=/opt/rh/devtoolset-8/root/usr/bin/gcc -DCMAKE_CXX_COMPILER=/opt/rh/devtoolset-8/root/usr/bin/g++ -DSKIP_JAVA_JAR=ON . \
   && LIBRARY_PATH="/usr/lib/x86_64-linux-gnu:$LIBRARY_PATH" make && make install \
   && cd /home/nebula \
   && rm -rf /home/nebula/*
