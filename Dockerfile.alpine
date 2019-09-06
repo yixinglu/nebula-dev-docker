@@ -15,6 +15,7 @@ RUN apk add --no-cache \
     curl \
     file \
     flex \
+    flex-dev \
     gcc \
     g++ \
     git \
@@ -36,7 +37,6 @@ RUN apk add --no-cache \
     readline \
     readline-dev \
     unzip \
-    vim \
     wget \
     xz-dev
 
