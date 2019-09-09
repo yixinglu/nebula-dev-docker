@@ -84,7 +84,7 @@ RUN wget https://dl.bintray.com/boostorg/release/1.66.0/source/boost_1_66_0.tar.
   && cd boost_1_66_0 \
   && . /etc/profile.d/devtoolset-8.sh \
   && ./bootstrap.sh --prefix=${DEVTOOLSET_PATH}/usr --without-icu --without-libraries=python \
-  && ./b2 cxxflags=${EXTRA_CXXFLAGS} linkflags="" link=static runtime-link=static install \
+  && ./b2 cxxflags=${EXTRA_CXXFLAGS} link=static runtime-link=static install \
   && ./b2 --clean-all \
   && cd .. \
   && rm -rf boost_*
