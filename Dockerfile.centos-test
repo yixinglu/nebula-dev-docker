@@ -31,6 +31,7 @@ RUN scl enable devtoolset-8 -- bash \
   && mkdir -p /home/nebula \
   && echo 'source /opt/rh/devtoolset-8/enable' >> ~/.bash_profile
 
+ENV NEBULA_HOME /home/nebula
 ENV EXTRA_CXXFLAGS "-O2 -m64 -march=x86-64"
 ENV EXTRA_PIC_CXXFLAGS "${EXTRA_CXXFLAGS} -fPIC -DPIC"
 ENV EXTRA_LDFLAGS "-static-libgcc -static-libstdc++"
@@ -108,12 +109,11 @@ RUN wget https://github.com/libunwind/libunwind/releases/download/v1.2.1/libunwi
   && rm -rf libunwind-*
 
 # Build and Install thirdparty
-RUN mkdir -p /home/nebula \
-  && git clone https://github.com/yixinglu/nebula-3rdparty.git /home/nebula/nebula-3rdparty \
-  && cd /home/nebula/nebula-3rdparty \
+RUN git clone --single-branch --branch master https://github.com/vesoft-inc/nebula-3rdparty.git ${NEBULA_HOME}/nebula-3rdparty \
+  && cd ${NEBULA_HOME}/nebula-3rdparty \
   && cmake -DSKIP_JAVA_JAR=ON . \
   && make && make install \
-  && cd /home/nebula \
-  && rm -rf /home/nebula/*
+  && cd ${NEBULA_HOME} \
+  && rm -rf ${NEBULA_HOME}/*
 
-WORKDIR /home/nebula
+WORKDIR ${NEBULA_HOME}
