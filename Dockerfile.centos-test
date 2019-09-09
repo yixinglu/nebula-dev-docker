@@ -4,11 +4,11 @@ LABEL maintainer="yee.yi@vesoft.com"
 
 RUN yum update -y \
   && yum install -y centos-release-scl \
+  && yum install -y devtoolset-8 \
   && yum install -y \
     autoconf \
     autoconf-archive \
     automake \
-    devtoolset-8 \
     file \
     git \
     java-1.8.0-openjdk \
@@ -42,6 +42,7 @@ WORKDIR ${NEBULA_HOME}
 RUN wget https://www.openssl.org/source/openssl-1.1.1c.tar.gz \
   && tar zxf openssl-1.1.1c.tar.gz \
   && cd openssl-1.1.1c \
+  && . /etc/profile.d/devtoolset-8.sh \
   && ./config no-shared threads ${EXTRA_CXXFLAGS} ${EXTRA_LDFLAGS} \
   && make && make install \
   && cd .. \
@@ -51,6 +52,7 @@ RUN wget https://www.openssl.org/source/openssl-1.1.1c.tar.gz \
 RUN wget https://github.com/Kitware/CMake/releases/download/v3.11.4/cmake-3.11.4.tar.gz \
   && tar zxf cmake-3.11.4.tar.gz \
   && cd cmake-3.11.4 \
+  && . /etc/profile.d/devtoolset-8.sh \
   && CXXFLAGS=${EXTRA_PIC_CXXFLAGS} CFLAGS=$CXXFLAGS CPPFLAGS=$CXXFLAGS LDFLAGS=${EXTRA_LDFLAGS} ./configure && make && make install \
   && cd .. \
   && rm -rf cmake-*
@@ -59,6 +61,7 @@ RUN wget https://github.com/Kitware/CMake/releases/download/v3.11.4/cmake-3.11.4
 RUN wget http://ftp.gnu.org/gnu/bison/bison-3.0.5.tar.gz \
   && tar xf bison-3.0.5.tar.gz \
   && cd bison-3.0.5 \
+  && . /etc/profile.d/devtoolset-8.sh \
   && CXXFLAGS="${EXTRA_PIC_CXXFLAGS}" CFLAGS=$CXXFLAGS CPPFLAGS=$CXXFLAGS LDFLAGS="${EXTRA_LDFLAGS}" ./configure --enable-shared=no --enable-static \
   && make && make install \
   && cd .. \
@@ -68,6 +71,7 @@ RUN wget http://ftp.gnu.org/gnu/bison/bison-3.0.5.tar.gz \
 RUN wget https://github.com/westes/flex/releases/download/v2.6.4/flex-2.6.4.tar.gz \
   && tar zxf flex-2.6.4.tar.gz \
   && cd flex-2.6.4 \
+  && . /etc/profile.d/devtoolset-8.sh \
   && CXXFLAGS=${EXTRA_PIC_CXXFLAGS} CFLAGS=$CXXFLAGS CPPFLAGS=$CXXFLAGS LDFLAGS=${EXTRA_LDFLAGS} ./configure --enable-shared=no \
   && make && make install \
   && cd .. \
@@ -77,6 +81,7 @@ RUN wget https://github.com/westes/flex/releases/download/v2.6.4/flex-2.6.4.tar.
 RUN wget https://dl.bintray.com/boostorg/release/1.66.0/source/boost_1_66_0.tar.gz \
   && tar zxf boost_1_66_0.tar.gz \
   && cd boost_1_66_0 \
+  && . /etc/profile.d/devtoolset-8.sh \
   && ./bootstrap.sh --without-icu --without-libraries=python \
   && ./b2 cxxflags=${EXTRA_CXXFLAGS} linkflags="" link=static runtime-link=static install \
   && ./b2 --clean-all \
@@ -87,6 +92,7 @@ RUN wget https://dl.bintray.com/boostorg/release/1.66.0/source/boost_1_66_0.tar.
 RUN wget http://ftp.gnu.org/pub/gnu/gperf/gperf-3.1.tar.gz \
   && tar zxf gperf-3.1.tar.gz \
   && cd gperf-3.1 \
+  && . /etc/profile.d/devtoolset-8.sh \
   && CXXFLAGS=${EXTRA_PIC_CXXFLAGS} CFLAGS=$CXXFLAGS CPPFLAGS=$CXXFLAGS LDFLAGS=${EXTRA_LDFLAGS} ./configure --enable-shared=no \
   && make && make install \
   && cd .. \
@@ -96,6 +102,7 @@ RUN wget http://ftp.gnu.org/pub/gnu/gperf/gperf-3.1.tar.gz \
 RUN wget https://github.com/krb5/krb5/archive/krb5-1.16.3-final.tar.gz \
   && tar zxf krb5-1.16.3-final.tar.gz \
   && cd krb5-krb5-1.16.3-final/src \
+  && . /etc/profile.d/devtoolset-8.sh \
   && autoreconf \
   && CXXFLAGS=$EXTRA_PIC_CXXFLAGS CFLAGS=$CXXFLAGS CPPFLAGS=$CXXFLAGS LDFLAGS=${EXTRA_LDFLAGS} ./configure --enable-static --disable-shared --disable-rpath --disable-aesni --disable-thread-support \
   && make all && make install \
@@ -106,6 +113,7 @@ RUN wget https://github.com/krb5/krb5/archive/krb5-1.16.3-final.tar.gz \
 RUN wget https://github.com/libunwind/libunwind/releases/download/v1.2.1/libunwind-1.2.1.tar.gz \
   && tar zxf libunwind-1.2.1.tar.gz \
   && cd libunwind-1.2.1 \
+  && . /etc/profile.d/devtoolset-8.sh \
   && CXXFLAGS=${EXTRA_PIC_CXXFLAGS} CFLAGS=$CXXFLAGS CPPFLAGS=$CXXFLAGS LDFLAGS=${EXTRA_LDFLAGS} ./configure --enable-shared=no \
   && cd .. \
   && rm -rf libunwind-*
@@ -113,6 +121,7 @@ RUN wget https://github.com/libunwind/libunwind/releases/download/v1.2.1/libunwi
 # Build and Install thirdparty
 RUN git clone --single-branch --branch master https://github.com/vesoft-inc/nebula-3rdparty.git ${NEBULA_HOME}/nebula-3rdparty \
   && cd ${NEBULA_HOME}/nebula-3rdparty \
+  && . /etc/profile.d/devtoolset-8.sh \
   && cmake -DSKIP_JAVA_JAR=ON . \
   && make && make install \
   && cd ${NEBULA_HOME} \
