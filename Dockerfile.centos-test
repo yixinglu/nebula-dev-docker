@@ -39,7 +39,17 @@ ENV EXTRA_LDFLAGS "-static-libgcc -static-libstdc++"
 
 WORKDIR ${NEBULA_HOME}
 
-# Install cmake-3.11.4 before openssl
+# Install openssl-1.1.0h
+RUN wget https://www.openssl.org/source/old/1.1.0/openssl-1.1.0h.tar.gz \
+  && tar zxf openssl-1.1.0h.tar.gz \
+  && cd openssl-1.1.0h \
+  && . /etc/profile.d/devtoolset-8.sh \
+  && ./config --prefix=${DEVTOOLSET_PATH}/usr --openssldir=${DEVTOOLSET_PATH}/usr/ssl no-shared threads ${EXTRA_CXXFLAGS} ${EXTRA_LDFLAGS} \
+  && make && make install \
+  && cd .. \
+  && rm -rf openssl-*
+
+# Install cmake-3.11.4
 RUN wget https://github.com/Kitware/CMake/releases/download/v3.11.4/cmake-3.11.4.tar.gz \
   && tar zxf cmake-3.11.4.tar.gz \
   && cd cmake-3.11.4 \
@@ -47,16 +57,6 @@ RUN wget https://github.com/Kitware/CMake/releases/download/v3.11.4/cmake-3.11.4
   && CXXFLAGS=${EXTRA_PIC_CXXFLAGS} CFLAGS=$CXXFLAGS CPPFLAGS=$CXXFLAGS LDFLAGS=${EXTRA_LDFLAGS} ./configure --prefix=${DEVTOOLSET_PATH}/usr && make && make install \
   && cd .. \
   && rm -rf cmake-*
-
-# Install openssl-1.1.1c
-RUN wget https://www.openssl.org/source/openssl-1.1.1c.tar.gz \
-  && tar zxf openssl-1.1.1c.tar.gz \
-  && cd openssl-1.1.1c \
-  && . /etc/profile.d/devtoolset-8.sh \
-  && ./config --prefix=${DEVTOOLSET_PATH}/usr --openssldir=${DEVTOOLSET_PATH}/usr no-shared threads ${EXTRA_CXXFLAGS} ${EXTRA_LDFLAGS} \
-  && make && make install \
-  && cd .. \
-  && rm -rf openssl-*
 
 # Install bison-3.0.5
 RUN wget http://ftp.gnu.org/gnu/bison/bison-3.0.5.tar.gz \
