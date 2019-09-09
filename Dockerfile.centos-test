@@ -29,7 +29,7 @@ RUN yum update -y \
 
 RUN scl enable devtoolset-8 -- bash \
   && mkdir -p /home/nebula \
-  && echo 'source /opt/rh/devtoolset-8/enable' >> ~/.bash_profile
+  && echo '. /opt/rh/devtoolset-8/enable' >> /etc/profile.d/devtoolset-8.sh
 
 ENV NEBULA_HOME /home/nebula
 ENV EXTRA_CXXFLAGS "-O2 -m64 -march=x86-64"
