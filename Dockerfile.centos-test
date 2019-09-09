@@ -116,6 +116,7 @@ RUN wget https://github.com/libunwind/libunwind/releases/download/v1.2.1/libunwi
   && cd libunwind-1.2.1 \
   && . /etc/profile.d/devtoolset-8.sh \
   && CXXFLAGS=${EXTRA_PIC_CXXFLAGS} CFLAGS=$CXXFLAGS CPPFLAGS=$CXXFLAGS LDFLAGS=${EXTRA_LDFLAGS} ./configure --prefix=${DEVTOOLSET_PATH}/usr --enable-shared=no \
+  && make && make install \
   && cd .. \
   && rm -rf libunwind-*
 
