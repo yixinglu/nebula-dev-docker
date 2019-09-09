@@ -2,8 +2,6 @@ FROM centos:7
 
 LABEL maintainer="yee.yi@vesoft.com"
 
-# TODO(yee): -O2
-
 RUN yum update -y \
   && yum install -y centos-release-scl \
   && yum install -y \
