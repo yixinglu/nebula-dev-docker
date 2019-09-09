@@ -33,11 +33,15 @@ RUN scl enable devtoolset-8 -- bash \
   && mkdir -p /home/nebula \
   && echo 'source /opt/rh/devtoolset-8/enable' >> ~/.bash_profile
 
+ENV EXTRA_CXXFLAGS "-O2 -m64 -march=x86-64"
+ENV EXTRA_PIC_CXXFLAGS "${EXTRA_CXXFLAGS} -fPIC -DPIC"
+ENV EXTRA_LDFLAGS "-static-libgcc -static-libstdc++"
+
 # Install openssl-1.1.1c
 RUN wget https://www.openssl.org/source/openssl-1.1.1c.tar.gz \
   && tar zxf openssl-1.1.1c.tar.gz \
   && cd openssl-1.1.1c \
-  && ./config no-shared threads -fPIC -DPIC -static-libgcc -static-libstdc++ \
+  && ./config no-shared threads ${EXTRA_CXXFLAGS} ${EXTRA_LDFLAGS} \
   && make && make install \
   && cd .. \
   && rm -rf openssl-*
@@ -46,7 +50,7 @@ RUN wget https://www.openssl.org/source/openssl-1.1.1c.tar.gz \
 RUN wget https://github.com/Kitware/CMake/releases/download/v3.11.4/cmake-3.11.4.tar.gz \
   && tar zxf cmake-3.11.4.tar.gz \
   && cd cmake-3.11.4 \
-  && ./configure && make && make install \
+  && CXXFLAGS=${EXTRA_PIC_CXXFLAGS} CFLAGS=$CXXFLAGS CPPFLAGS=$CXXFLAGS LDFLAGS=${EXTRA_LDFLAGS} ./configure && make && make install \
   && cd .. \
   && rm -rf cmake-*
 
@@ -54,7 +58,7 @@ RUN wget https://github.com/Kitware/CMake/releases/download/v3.11.4/cmake-3.11.4
 RUN wget http://ftp.gnu.org/gnu/bison/bison-3.0.5.tar.gz \
   && tar xf bison-3.0.5.tar.gz \
   && cd bison-3.0.5 \
-  && ./configure \
+  && CXXFLAGS="${EXTRA_PIC_CXXFLAGS}" CFLAGS=$CXXFLAGS CPPFLAGS=$CXXFLAGS LDFLAGS="${EXTRA_LDFLAGS}" ./configure --enable-shared=no --enable-static \
   && make && make install \
   && cd .. \
   && rm -rf bison-*
@@ -63,7 +67,7 @@ RUN wget http://ftp.gnu.org/gnu/bison/bison-3.0.5.tar.gz \
 RUN wget https://github.com/westes/flex/releases/download/v2.6.4/flex-2.6.4.tar.gz \
   && tar zxf flex-2.6.4.tar.gz \
   && cd flex-2.6.4 \
-  && ./configure --enable-shared=no \
+  && CXXFLAGS=${EXTRA_PIC_CXXFLAGS} CFLAGS=$CXXFLAGS CPPFLAGS=$CXXFLAGS LDFLAGS=${EXTRA_LDFLAGS} ./configure --enable-shared=no \
   && make && make install \
   && cd .. \
   && rm -rf flex-*
@@ -73,7 +77,7 @@ RUN wget https://dl.bintray.com/boostorg/release/1.66.0/source/boost_1_66_0.tar.
   && tar zxf boost_1_66_0.tar.gz \
   && cd boost_1_66_0 \
   && ./bootstrap.sh --without-icu --without-libraries=python \
-  && ./b2 link=static runtime-link=static install \
+  && ./b2 cxxflags=${EXTRA_CXXFLAGS} linkflags="" link=static runtime-link=static install \
   && ./b2 --clean-all \
   && cd .. \
   && rm -rf boost_*
@@ -82,7 +86,7 @@ RUN wget https://dl.bintray.com/boostorg/release/1.66.0/source/boost_1_66_0.tar.
 RUN wget http://ftp.gnu.org/pub/gnu/gperf/gperf-3.1.tar.gz \
   && tar zxf gperf-3.1.tar.gz \
   && cd gperf-3.1 \
-  && ./configure --enable-shared=no \
+  && CXXFLAGS=${EXTRA_PIC_CXXFLAGS} CFLAGS=$CXXFLAGS CPPFLAGS=$CXXFLAGS LDFLAGS=${EXTRA_LDFLAGS} ./configure --enable-shared=no \
   && make && make install \
   && cd .. \
   && rm -rf gperf-*
@@ -92,7 +96,7 @@ RUN wget https://github.com/krb5/krb5/archive/krb5-1.16.3-final.tar.gz \
   && tar zxf krb5-1.16.3-final.tar.gz \
   && cd krb5-krb5-1.16.3-final/src \
   && autoreconf \
-  && ./configure --enable-static --disable-shared --disable-rpath --disable-aesni --disable-thread-support \
+  && CXXFLAGS=$EXTRA_PIC_CXXFLAGS CFLAGS=$CXXFLAGS CPPFLAGS=$CXXFLAGS LDFLAGS=${EXTRA_LDFLAGS} ./configure --enable-static --disable-shared --disable-rpath --disable-aesni --disable-thread-support \
   && make all && make install \
   && cd .. \
   && rm -rf krb5-*
@@ -101,7 +105,7 @@ RUN wget https://github.com/krb5/krb5/archive/krb5-1.16.3-final.tar.gz \
 RUN wget https://github.com/libunwind/libunwind/releases/download/v1.2.1/libunwind-1.2.1.tar.gz \
   && tar zxf libunwind-1.2.1.tar.gz \
   && cd libunwind-1.2.1 \
-  && ./configure --enable-shared=no \
+  && CXXFLAGS=${EXTRA_PIC_CXXFLAGS} CFLAGS=$CXXFLAGS CPPFLAGS=$CXXFLAGS LDFLAGS=${EXTRA_LDFLAGS} ./configure --enable-shared=no \
   && cd .. \
   && rm -rf libunwind-*
 
