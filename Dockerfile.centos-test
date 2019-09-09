@@ -54,7 +54,8 @@ RUN wget https://github.com/Kitware/CMake/releases/download/v3.11.4/cmake-3.11.4
   && tar zxf cmake-3.11.4.tar.gz \
   && cd cmake-3.11.4 \
   && . /etc/profile.d/devtoolset-8.sh \
-  && CXXFLAGS=${EXTRA_PIC_CXXFLAGS} CFLAGS=$CXXFLAGS CPPFLAGS=$CXXFLAGS LDFLAGS=${EXTRA_LDFLAGS} ./configure --prefix=${DEVTOOLSET_PATH}/usr && make && make install \
+  && CXXFLAGS=${EXTRA_PIC_CXXFLAGS} CFLAGS=$CXXFLAGS CPPFLAGS=$CXXFLAGS LDFLAGS="${EXTRA_LDFLAGS} -pthread" ./configure --prefix=${DEVTOOLSET_PATH}/usr \
+  && make && make install \
   && cd .. \
   && rm -rf cmake-*
 
