@@ -36,6 +36,8 @@ ENV EXTRA_CXXFLAGS "-O2 -m64 -march=x86-64"
 ENV EXTRA_PIC_CXXFLAGS "${EXTRA_CXXFLAGS} -fPIC -DPIC"
 ENV EXTRA_LDFLAGS "-static-libgcc -static-libstdc++"
 
+WORKDIR ${NEBULA_HOME}
+
 # Install openssl-1.1.1c
 RUN wget https://www.openssl.org/source/openssl-1.1.1c.tar.gz \
   && tar zxf openssl-1.1.1c.tar.gz \
@@ -115,5 +117,3 @@ RUN git clone --single-branch --branch master https://github.com/vesoft-inc/nebu
   && make && make install \
   && cd ${NEBULA_HOME} \
   && rm -rf ${NEBULA_HOME}/*
-
-WORKDIR ${NEBULA_HOME}
