@@ -13,7 +13,6 @@ RUN yum update -y \
     git \
     java-1.8.0-openjdk \
     libtool \
-    libstdc++-static \
     make \
     maven \
     ncurses-devel \
