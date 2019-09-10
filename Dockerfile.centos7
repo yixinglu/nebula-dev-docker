@@ -19,6 +19,7 @@ RUN yum update -y \
     perl \
     perl-WWW-Curl \
     readline-devel \
+    rpm-build \
     unzip \
     vim \
     wget \
