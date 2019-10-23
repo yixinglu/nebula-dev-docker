@@ -13,7 +13,7 @@ RUN yum update -y && yum -y install \
   && yum clean all \
   && rm -rf /var/cache/yum
 
-RUN curl -fsSL https://raw.githubusercontent.com/vesoft-inc/nebula/master/build_dep.sh -o /tmp/nebula_build_dep.sh && \
+RUN curl -fsSL https://raw.githubusercontent.com/yixinglu/nebula/some-fixes/build_dep.sh -o /tmp/nebula_build_dep.sh && \
   bash /tmp/nebula_build_dep.sh ${AREA} && \
   rm -rf /tmp/nebula_build_dep.sh
 

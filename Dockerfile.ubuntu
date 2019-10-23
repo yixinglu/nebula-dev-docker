@@ -11,7 +11,7 @@ RUN apt-get update && apt-get install -y \
   vim \
   && rm -rf /var/lib/apt/lists/*
 
-RUN curl -fsSL https://raw.githubusercontent.com/vesoft-inc/nebula/master/build_dep.sh -o /tmp/nebula_build_dep.sh && \
+RUN curl -fsSL https://raw.githubusercontent.com/yixinglu/nebula/some-fixes/build_dep.sh -o /tmp/nebula_build_dep.sh && \
   bash /tmp/nebula_build_dep.sh ${AREA} && \
   rm -rf /tmp/nebula_build_dep.sh
 
