@@ -4,17 +4,15 @@ FROM ubuntu:${VERSION}
 ARG AREA=U
 
 RUN apt-get update && apt-get install -y \
-  curl \
-  gdb \
-  git \
-  sudo \
-  vim \
-  wget \
-  && rm -rf /var/lib/apt/lists/*
-
-RUN curl -fsSL https://raw.githubusercontent.com/yixinglu/nebula/some-fixes/build_dep.sh -o /tmp/nebula_build_dep.sh && \
-  bash /tmp/nebula_build_dep.sh ${AREA} && \
-  rm -rf /tmp/nebula_build_dep.sh
+    curl \
+    gdb \
+    git \
+    sudo \
+    vim \
+    wget \
+  && curl -fsSL https://raw.githubusercontent.com/yixinglu/nebula/some-fixes/build_dep.sh -o /tmp/nebula_build_dep.sh \
+  && bash /tmp/nebula_build_dep.sh ${AREA} \
+  && rm -rf /var/lib/apt/lists/* /tmp/nebula_build_dep.sh
 
 RUN mkdir -p /home/nebula
 
